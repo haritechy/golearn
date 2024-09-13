@@ -236,3 +236,54 @@ func Warrantydatget(c *gin.Context) {
 	}).Info("Warranty data retrieved successfully")
 	c.JSON(http.StatusOK, &Warrantydata)
 }
+
+func WrrantyDatagetDelete(c *gin.Context) {
+
+	var id = c.Param("id")
+	var Warrantydata []models.WrrantyData
+	result := database.DB.First(&Warrantydata, id)
+	if result.Error != nil {
+		logger.WithError(result.Error).Error("Error warrnty  found")
+		c.JSON(http.StatusBadRequest, gin.H{"Error": "warranty not found"})
+		return
+	}
+	database.DB.Delete(&Warrantydata, id)
+
+	c.JSON(http.StatusOK, "Warranty delte succesful")
+
+}
+
+func WarrntyDataUpdate(c *gin.Context) {
+
+	var WrrantyData models.WrrantyData
+	var id = c.Param("id")
+	var body = models.WrrantyData{}
+	if err := c.BindJSON(&body); err != nil {
+
+		logger.WithError(err).Error("invalid body format")
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid body format"})
+		return
+	}
+	result := database.DB.First(&WrrantyData, id)
+	if result.Error != nil {
+		logger.WithError(result.Error).Error("Wrranty id not found")
+		c.JSON(http.StatusBadRequest, "warnntty id not found")
+		return
+	}
+
+	if err := database.DB.Model(&WrrantyData).Updates(body).Error; err != nil {
+
+		logger.WithError(err).Error("faild to update fileds")
+		c.JSON(http.StatusBadRequest, err)
+		return
+	}
+	// WrrantyData.Name = body.Name
+	// WrrantyData.PictureName = body.PictureName
+
+	// // database.DB.Save(&WrrantyData)
+	// logger.WithFields(logrus.Fields{
+	// 	"data": WrrantyData,
+	// }).Info("warranty update succeful")
+	c.JSON(http.StatusOK, &WrrantyData)
+
+}

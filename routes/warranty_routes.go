@@ -17,6 +17,9 @@ func WarrantyRoutes(r *gin.Engine) {
 		warrantyRoutes.GET("/pending", controller.PendingWarranty)
 		warrantyRoutes.DELETE("/delete/:id", controller.DeleteWarranty)
 		warrantyRoutes.POST("/upload", controller.ExcelUpload)
+		warrantyRoutes.DELETE("/deletes/:id", controller.WrrantyDatagetDelete)
+		warrantyRoutes.GET("/alls", controller.Warrantydatget)
+		warrantyRoutes.PUT("/ups/:id", controller.WarrntyDataUpdate)
 
 	}
 }
