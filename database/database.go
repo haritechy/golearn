@@ -35,4 +35,7 @@ func Connect() {
 	DB.AutoMigrate(&models.User{})
 	DB.AutoMigrate(&models.WrrantyData{})
 
+	DB.AutoMigrate(&models.Votes{})
+	DB.AutoMigrate(&models.Candidate{})
+
 }

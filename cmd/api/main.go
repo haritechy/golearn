@@ -1,6 +1,7 @@
 package main
 
 import (
+	"employeeregister/controller"
 	"employeeregister/database"
 	"employeeregister/routes"
 	"log"
@@ -23,6 +24,8 @@ func main() {
 	routes.EmployeeRoutes(r)
 	routes.WarrantyRoutes(r)
 	routes.UserRoutes(r)
-
+	routes.VoterRoutes(r)
+	controller.Arrays()
 	r.Run(":8080")
+
 }

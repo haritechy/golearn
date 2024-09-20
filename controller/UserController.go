@@ -3,8 +3,10 @@ package controller
 import (
 	"employeeregister/database"
 	"employeeregister/models"
+	"employeeregister/utils"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -45,7 +47,30 @@ func UserRegister(c *gin.Context) {
 		return
 	}
 
+	if err := utils.ValidateEmail(UserRegister.Email); err != nil {
+
+		logger.Errorf("Invalid email fomar", err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid email"})
+		return
+
+	}
+
+	var existingUser models.User
+	if err := database.DB.Where("email = ?", UserRegister.Email).First(&existingUser).Error; err == nil {
+		logger.Errorf("Email already registered: %v", UserRegister.Email)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Email is already registered"})
+		return
+	}
+
+	if err := utils.Validatepassword(strings.TrimSpace(UserRegister.Password)); err != nil {
+
+		logger.Errorf("Error hashing password:%v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to hash password"})
+		return
+	}
+
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(UserRegister.Password), bcrypt.DefaultCost)
+
 	if err != nil {
 		logger.Errorf("Error hashing password: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to hash password"})
@@ -53,6 +78,13 @@ func UserRegister(c *gin.Context) {
 	}
 
 	UserRegister.Password = string(hashedPassword)
+	var ExistingPassowrd models.User
+	if err := database.DB.Where("password = ?", string(hashedPassword)).First(&ExistingPassowrd).Error; err == nil {
+
+		logger.Errorf("Password is already taken by  user: %v", UserRegister.Password)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Password is already taken by  user"})
+		return
+	}
 	result := database.DB.Create(&UserRegister)
 	if result.Error != nil {
 		logger.Errorf("Error creating user: %v", result.Error)
