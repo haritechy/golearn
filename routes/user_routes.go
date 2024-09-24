@@ -14,6 +14,8 @@ func UserRoutes(r *gin.Engine) {
 		userRoutes.DELETE("/del/:id", controller.UseDelete)
 		userRoutes.PUT("/eupdate/:id", controller.UserUpdate)
 		userRoutes.POST("/login", controller.UserLogin)
+		userRoutes.POST("/chanege", controller.ChnagePassword)
+		userRoutes.POST("/for", controller.UserForgot)
 		userRoutes.GET("/:id", controller.UserGetbyEmail)
 	}
 }

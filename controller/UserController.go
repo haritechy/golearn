@@ -4,9 +4,13 @@ import (
 	"employeeregister/database"
 	"employeeregister/models"
 	"employeeregister/utils"
+	"fmt"
+
 	"net/http"
 	"os"
 	"strings"
+
+	"math/rand"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -209,5 +213,96 @@ func UserLogin(c *gin.Context) {
 	}
 
 	logger.Infof("User logged in successfully: %v", user.Email)
-	c.JSON(http.StatusOK, &token)
+	c.JSON(http.StatusOK, gin.H{"message": "userlogin succesful",
+		"login_token": token,
+	})
+}
+func UserForgot(c *gin.Context) {
+	var Users models.User
+
+	var Forgotdata struct {
+		Email string
+	}
+	var randowCodes = [...]byte{
+		'1', '2', '3', '4', '5', '6', '7', '8', '9', '0',
+	}
+	var r *rand.Rand = rand.New(rand.NewSource(time.Now().UnixNano()))
+	var pwd []byte = make([]byte, 6)
+	for i := 0; i < 3; i++ {
+
+		for j := 0; j < 6; j++ {
+			index := r.Int() % len(randowCodes)
+
+			pwd[j] = randowCodes[index]
+		}
+
+		fmt.Printf("%s\n", string(pwd))
+	}
+
+	if err := c.BindJSON(&Forgotdata); err != nil {
+
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid json type"})
+		return
+
+	}
+	result := database.DB.Where("email=?", Forgotdata.Email).First(&Users)
+	if result.Error != nil {
+		logger.Errorf("Error sending email: %v", result.Error)
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Email does not find your db"})
+		return
+	}
+
+	otp := string(pwd)
+	utils.SendEmail(Users.Email, "Forgot password", otp)
+	Users.Otp = otp
+
+	if err := database.DB.Model(&Users).Update("Otp", Users.Otp).Error; err != nil {
+
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to update OTP"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "OTP sent to email"})
+
+}
+
+func ChnagePassword(c *gin.Context) {
+	var Users models.User
+	var PasswordChange struct {
+		Otp        string `json:"otp"`
+		NewPasword string `json:"newpassword"`
+	}
+
+	if err := c.BindJSON(&PasswordChange); err != nil {
+		logger.Errorf("error invalid body  or filed missing %v", err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid json type"})
+		return
+
+	}
+
+	result := database.DB.Where("Otp=?", PasswordChange.Otp).First(&Users)
+	if result.Error != nil {
+		logger.Errorf("Error : %v", result.Error)
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Otp not found or invalid Otp"})
+		return
+	}
+	utils.Validatepassword(PasswordChange.NewPasword)
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(PasswordChange.NewPasword), bcrypt.DefaultCost)
+	if err != nil {
+		logger.Errorf("Error hashing password: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to hash password"})
+		return
+	}
+	if err := database.DB.Model(&Users).Update("password", hashedPassword).Error; err != nil {
+		c.JSON(http.StatusBadRequest, "error updating password")
+		return
+	}
+
+	if err := database.DB.Model(&Users).Update("Otp", "").Error; err != nil {
+		logger.Errorf("Error clearing OTP: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to clear OTP"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "password changed succeful"})
+
 }

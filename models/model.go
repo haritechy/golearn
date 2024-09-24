@@ -29,11 +29,12 @@ type Warranty struct {
 type User struct {
 	gorm.Model
 
-	FirstName string `json:"firstname" binding:"required" gorm:"not null"`
-	LastName  string `json:"lastname"  binding:"required" gorm:"not null"`
-	FullName  string `json:"fullname"  binding:"required" gorm:"not null"`
-	Password  string `json:"password"  binding:"required" gorm:"not null"`
-	Email     string `json:"email"  binding:"required" gorm:"not null"`
+	FirstName string `json:"firstname"`
+	LastName  string `json:"lastname" `
+	FullName  string `json:"fullname"`
+	Password  string `json:"password"`
+	Email     string `json:"email"`
+	Otp       string `json:"otp"`
 }
 
 type Claims struct {
@@ -53,19 +54,29 @@ type WrrantyData struct {
 	MonthlyPrice    string `json:"monthlyprice"  binding:"required" gorm:"not null"`
 	Discount        string `json:"discount" `
 	AnnualPrice     string `json:"annualprice"  binding:"required" gorm:"not null"`
-	PlanDescription string `json:"plandescription  binding:"required" gorm:"not null"`
+	PlanDescription string `json:"plandescription"  binding:"required" gorm:"not null"`
 	Status          string `json:"status"  binding:"required" gorm:"not null"`
 	Picture         string `json:"picture"  binding:"required" gorm:"not null"`
-	PictureName     string `json:"picturename   binding:"required" gorm:"not null"`
+	PictureName     string `json:"picturename"   binding:"required" gorm:"not null"`
 }
 
 type Votes struct {
 	ID          uint `gorm:"primaryKey"`
 	VoterId     int  `json:"voteId"`
-	CandidateId int  `json:"candidateid`
+	CandidateId int  `json:"candidateid"`
 }
 type Candidate struct {
 	Id        uint   `gorm:"PrimaryKey"`
 	Name      string `gorm:"name"`
 	VoteCount int    `gorm:"default:0"`
+}
+
+type UserMessage struct {
+	Name        string `json:"name"`
+	Email       string `json:"email" binding:"required"`
+	Message     string `json:"message" binding:"required"`
+	PhoneNumber string `json:"phonenumber" binding:"required"`
+}
+type Otp struct {
+	Otp string
 }

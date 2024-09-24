@@ -24,6 +24,7 @@ func main() {
 	routes.EmployeeRoutes(r)
 	routes.WarrantyRoutes(r)
 	routes.UserRoutes(r)
+	routes.ContactRoutes(r)
 	routes.VoterRoutes(r)
 	controller.Arrays()
 	r.Run(":8080")

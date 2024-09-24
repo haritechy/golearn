@@ -34,8 +34,8 @@ func Connect() {
 	DB.AutoMigrate(&models.Warranty{})
 	DB.AutoMigrate(&models.User{})
 	DB.AutoMigrate(&models.WrrantyData{})
-
+	DB.AutoMigrate(&models.Otp{})
 	DB.AutoMigrate(&models.Votes{})
 	DB.AutoMigrate(&models.Candidate{})
-
+	DB.AutoMigrate(&models.UserMessage{})
 }
