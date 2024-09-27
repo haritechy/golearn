@@ -13,11 +13,8 @@ func ValidateEmail(email string) error {
 	return nil
 }
 func Validatepassword(password string) error {
-
 	if len(password) < 8 {
-
 		return fmt.Errorf("Password must be at least 8 character")
-
 	}
 	uppercaseRegex := regexp.MustCompile(`[A-Z]`)
 	if !uppercaseRegex.MatchString(password) {

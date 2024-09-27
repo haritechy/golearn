@@ -3,6 +3,7 @@ package main
 import (
 	"employeeregister/controller"
 	"employeeregister/database"
+	"employeeregister/middleware"
 	"employeeregister/routes"
 	"log"
 
@@ -20,6 +21,7 @@ func main() {
 	gin.SetMode(gin.ReleaseMode)
 	database.Connect()
 	r := gin.Default()
+	r.Use(middleware.CorsMiddleware())
 
 	routes.EmployeeRoutes(r)
 	routes.WarrantyRoutes(r)

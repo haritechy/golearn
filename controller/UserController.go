@@ -53,7 +53,7 @@ func UserRegister(c *gin.Context) {
 
 	if err := utils.ValidateEmail(UserRegister.Email); err != nil {
 
-		logger.Errorf("Invalid email fomar", err)
+		logger.Errorf("Invalid email fomartd %v", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid email"})
 		return
 

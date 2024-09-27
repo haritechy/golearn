@@ -122,7 +122,7 @@ func DeleteCandidate(c *gin.Context) {
 
 	if err := database.DB.First(&Candidate, param).Error; err != nil {
 
-		logger.Errorf("id not found", err.Error())
+		logger.Errorf("id not found%v", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}

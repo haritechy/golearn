@@ -43,5 +43,5 @@ func UserMessage(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not send to email to admin"})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"message": "Message received and email sento to both user and admin"})
+	c.JSON(http.StatusOK, gin.H{"message": "Message received and email sento to both user and admin", "data": UserMessage})
 }
